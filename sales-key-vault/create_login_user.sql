@@ -1,0 +1,3 @@
+CREATE LOGIN adwks WITH PASSWORD = 'xFg2q3mK9td6h8hrrS9j'
+
+CREATE USER adwks FOR LOGIN adwks
