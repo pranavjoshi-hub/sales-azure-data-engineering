@@ -1,3 +1,3 @@
-CREATE LOGIN adwks WITH PASSWORD = '********************'
+CREATE LOGIN a**** WITH PASSWORD = '********************'
 
-CREATE USER adwks FOR LOGIN adwks
+CREATE USER adwks FOR LOGIN a****
