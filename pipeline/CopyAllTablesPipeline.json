@@ -1,0 +1,175 @@
+{
+	"name": "CopyAllTablesPipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "LookupAllTables",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "SELECT \ns.name AS SchemaName,\nt.name AS TableName\nFROM sys.tables t\nINNER JOIN sys.schemas s\nON t.schema_id = s.schema_id\nWHERE s.name = 'SalesLT'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "SQLServerAllTables",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEachTable",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "LookupAllTables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('LookupAllTables').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "CopyAllTables",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "@{concat('SELECT * FROM ', item().SchemaName, '.', item().TableName)}",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SQLServerAllTablesCopy",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DataLakeAllTablesParquet",
+									"type": "DatasetReference",
+									"parameters": {
+										"schemaname": {
+											"value": "@item().SchemaName",
+											"type": "Expression"
+										},
+										"tablename": {
+											"value": "@item().TableName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "BronzeToSilver",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "ForEachTable",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/pranavj6480@gmail.com/DataTransformationBronzeSilver"
+				},
+				"linkedServiceName": {
+					"referenceName": "DatabricksService",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "SilverToGold",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "BronzeToSilver",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/pranavj6480@gmail.com/DataTransformationSilverGold"
+				},
+				"linkedServiceName": {
+					"referenceName": "DatabricksService",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2024-03-22T00:15:25Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

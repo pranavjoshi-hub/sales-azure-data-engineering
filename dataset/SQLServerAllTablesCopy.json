@@ -1,0 +1,13 @@
+{
+	"name": "SQLServerAllTablesCopy",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLServerService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
