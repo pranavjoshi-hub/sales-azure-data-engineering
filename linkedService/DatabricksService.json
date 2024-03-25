@@ -1,0 +1,14 @@
+{
+	"name": "DatabricksService",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-3902072976386422.2.azuredatabricks.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/28bc39d7-86f1-4535-a99b-12421cacd320/resourceGroups/sales-project/providers/Microsoft.Databricks/workspaces/sales-databricks",
+			"existingClusterId": "0314-172122-gf3zyn7f"
+		}
+	}
+}

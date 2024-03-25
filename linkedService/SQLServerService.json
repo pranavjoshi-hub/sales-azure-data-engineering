@@ -1,0 +1,23 @@
+{
+	"name": "SQLServerService",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Data Source=LAPTOP-2UCKP59J;Initial Catalog=AdventureWorksLT2019;User ID=adwks",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "KeyVaultService",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "password-sales-project"
+			}
+		},
+		"connectVia": {
+			"referenceName": "SelfHostedIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

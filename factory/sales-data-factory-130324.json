@@ -1,0 +1,9 @@
+{
+	"name": "sales-data-factory-130324",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "3295672f-7607-47a9-af92-28bb0ad085d0",
+		"tenantId": "1dc79040-a75a-4ac7-bec1-f9bdbf5f29f4"
+	}
+}
