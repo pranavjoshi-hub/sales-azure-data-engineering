@@ -25,26 +25,26 @@
 !['Copy-All-Tables-Pipeline' work-flow in ADF resource 'sales-data-factory-130324'](https://github.com/pranavjoshi-hub/sales-azure-data-engineering/blob/master/images/data_factory.png)
 
 - The 'Lookup' activity in the pipeline is used to fetch the list of schemas and tables using the following SQL query:  
-  **SELECT s.name AS SchemaName, t.name AS TableName**  
-  **FROM sys.tables t**  
-  **INNER JOIN sys.schemas s**  
-  **ON t.schema_id = s.schema_id**  
-  **WHERE s.name = 'SalesLT'**  
+  __SELECT s.name AS SchemaName, t.name AS TableName__  
+  __FROM sys.tables t__  
+  __INNER JOIN sys.schemas s__  
+  __ON t.schema_id = s.schema_id__  
+  __WHERE s.name = 'SalesLT'__  
   
 - The next activity is 'For Each' and it encapsulates a 'Copy' activity. This will enable looping through each table belonging to schema 'SalesLT'.
 - The 'Items' parameter in the 'For Each' activity is set to the following expression in order to loop through each object in the output of the 'Lookup' activity:  
-  **@activity('LookupAllTables').output.value**
+  __@activity('LookupAllTables').output.value__
 
 - Next, the 'Copy' activity will copy data in each of the tables to a container called 'Bronze' in the ADLS Gen 2 storage account, in parquet format. The parquet format is a columnar storage format that has in-built encoding and compression techniques, thus making it a highly efficient format option for data storage.
 - The 'Copy' activity source is dynamically configured with it's 'Query' parameter set as follows:  
-  **@{concat('SELECT * FROM ', item().SchemaName, '.', item().TableName)}**
+  __@{concat('SELECT * FROM ', item().SchemaName, '.', item().TableName)}__
 
 - The 'Copy' activity sink is also dynamically configured in order to ensure that each parquet file containing data of each table is stored to an individual directory in the storage account. The sink dataset file path is set to the following:  
-  **bronze / @{concat(dataset().schemaname, '/',dataset().tablename)} / @{concat(dataset().tablename, '.parquet')}**
+  __bronze / @{concat(dataset().schemaname, '/',dataset().tablename)} / @{concat(dataset().tablename, '.parquet')}__
 
 The sink dataset has the following paramters set to values as follows:  
-  **schemaname = @item().SchemaName**    
-  **tablename = @item.TableName**
+  __schemaname = @item().SchemaName__    
+  __tablename = @item.TableName__
   
 - Below is a list of tables belonging to the schema 'SalesLT' that are copied to the storage account:
 1. Address
